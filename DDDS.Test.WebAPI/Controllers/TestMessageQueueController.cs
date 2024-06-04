@@ -18,7 +18,7 @@ namespace DDDS.Test.WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> PublishMessage(QueueMessage queueMessage)
+        public async Task<IActionResult> PublishMessage(QueueMessage queueMessage, CancellationToken cancellationToken)
         {
             int messageCount = queueMessages.Count();
 
@@ -28,8 +28,7 @@ namespace DDDS.Test.WebAPI.Controllers
 
                 Uri endPointUri = new Uri(uri);
                 ISendEndpoint ep = await _bus.GetSendEndpoint(endPointUri);
-
-                await ep.SendBatch(queueMessages);
+                await ep.SendBatch(queueMessages, cancellationToken);
                 queueMessages.Clear();
 
                 return Ok($"{messageCount}");
