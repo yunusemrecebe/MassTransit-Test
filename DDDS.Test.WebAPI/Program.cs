@@ -22,19 +22,6 @@ builder.Services.AddMassTransit(x =>
             c.Password(RabbitMQConstants.Password);
         });
 
-        cfg.ReceiveEndpoint(RabbitMQConstants.Events.LoadingInstructionCreated, e =>
-        {
-            e.Bind("LoadingGateway");
-            e.ConfigureDefaultErrorTransport();
-            e.Durable = true;
-        });
-
-        cfg.ReceiveEndpoint(RabbitMQConstants.Events.LoadingInstructionThresholdExceeded, e =>
-        {
-            e.Bind("LoadingGateway");
-            e.ConfigureDefaultErrorTransport();
-        });
-
         cfg.ConfigureEndpoints(ctx);
     });
 });

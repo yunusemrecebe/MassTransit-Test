@@ -10,35 +10,23 @@ namespace DDDS.Test.WebAPI.Controllers
     public class TestMessageQueueController : ControllerBase
     {
         public readonly IBus _bus;
-        private static List<QueueMessage> queueMessages = new List<QueueMessage>();
-
         public TestMessageQueueController(IBus bus)
         {
             _bus = bus;
         }
 
         [HttpPost]
-        public async Task<IActionResult> PublishMessage(QueueMessage queueMessage, CancellationToken cancellationToken)
+        public async Task<IActionResult> InsertLoadingInstruction(QueueMessage queueMessage, CancellationToken cancellationToken)
         {
-            int messageCount = queueMessages.Count();
+            //queueMessage MSSQL YuklemeTalimatlari tablosuna Insert Et
 
-            if (++messageCount == 5)
-            {
-                string uri = $"{RabbitMQConstants.Uri}/{RabbitMQConstants.Events.LoadingInstructionThresholdExceeded}";
+            string uri = $"{RabbitMQConstants.Uri}/{RabbitMQConstants.Events.LoadingInstructionCreated}";
 
-                Uri endPointUri = new Uri(uri);
-                ISendEndpoint ep = await _bus.GetSendEndpoint(endPointUri);
-                await ep.SendBatch(queueMessages, cancellationToken);
-                queueMessages.Clear();
+            Uri endPointUri = new Uri(uri);
+            ISendEndpoint ep = await _bus.GetSendEndpoint(endPointUri);
+            await ep.Send(queueMessage, cancellationToken);
 
-                return Ok($"{messageCount}");
-            }
-            else
-            {
-                queueMessages.Add(queueMessage);
-
-                return Ok($"{messageCount}");
-            }
+            return Ok();
         }
     }
 }
