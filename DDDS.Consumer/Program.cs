@@ -1,7 +1,7 @@
 ﻿using DDDS.Consumer.MassTransit.Consumers;
 using DDDS.Test.WebAPI.Constants;
 using MassTransit;
-using MassTransit.Transports.Fabric;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
 

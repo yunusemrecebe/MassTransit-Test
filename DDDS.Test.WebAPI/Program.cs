@@ -26,6 +26,10 @@ builder.Services.AddMassTransit(x =>
     });
 });
 
+builder.Services.AddStackExchangeRedisCache(action => {
+    action.Configuration = "localhost:6379";
+});
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
