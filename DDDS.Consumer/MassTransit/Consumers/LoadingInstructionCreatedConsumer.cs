@@ -13,7 +13,7 @@ namespace DDDS.Consumer.MassTransit.Consumers
 
         public async Task Consume(ConsumeContext<QueueMessage> context)
         {
-            Console.WriteLine($"Data consumed {context.Message.Name}");
+            Console.WriteLine($"Data consumed {context.Message.CityCode}");
 
             QueueMessage message = context.Message;
             string cacheKey = message.CityCode.ToString();

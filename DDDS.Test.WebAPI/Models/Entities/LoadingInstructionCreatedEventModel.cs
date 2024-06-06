@@ -1,6 +1,6 @@
-﻿namespace DDDS.Test.WebAPI.Models.Interface
+﻿namespace LGW.MessageDistributor.MessageBus.Domain.Models
 {
-    public interface IQueueMessage : IEventModel
+    public class LoadingInstructionCreatedEventModel : EventModel
     {
         public int Id { get; set; }
         public int CityCode { get; set; }

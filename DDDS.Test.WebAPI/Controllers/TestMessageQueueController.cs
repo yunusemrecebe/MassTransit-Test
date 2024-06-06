@@ -1,5 +1,6 @@
 ﻿using DDDS.Test.WebAPI.Constants;
 using DDDS.Test.WebAPI.Models.Entities;
+using LGW.MessageDistributor.MessageBus.Domain.Models;
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,7 +17,7 @@ namespace DDDS.Test.WebAPI.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> InsertLoadingInstruction(QueueMessage queueMessage, CancellationToken cancellationToken)
+        public async Task<IActionResult> InsertLoadingInstruction(LoadingInstructionCreatedEventModel queueMessage, CancellationToken cancellationToken)
         {
             //queueMessage MSSQL YuklemeTalimatlari tablosuna Insert Et
 
@@ -28,5 +29,6 @@ namespace DDDS.Test.WebAPI.Controllers
 
             return Ok();
         }
+       
     }
 }
