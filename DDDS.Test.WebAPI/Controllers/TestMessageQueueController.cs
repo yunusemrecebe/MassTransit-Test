@@ -1,6 +1,5 @@
 ﻿using DDDS.Test.WebAPI.Constants;
-using DDDS.Test.WebAPI.Models.Entities;
-using LGW.MessageDistributor.MessageBus.Domain.Models;
+using LGW.MessageDistributor.Messagebus.Contract.Events;
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,12 +15,10 @@ namespace DDDS.Test.WebAPI.Controllers
             _bus = bus;
         }
 
-        [HttpPost]
+        [HttpPost("InsertLoadingInstruction")]
         public async Task<IActionResult> InsertLoadingInstruction(LoadingInstructionCreatedEventModel queueMessage, CancellationToken cancellationToken)
         {
-            //queueMessage MSSQL YuklemeTalimatlari tablosuna Insert Et
-
-            string uri = $"{RabbitMQConstants.Uri}/{RabbitMQConstants.Events.LoadingInstructionCreated}";
+            string uri = $"{RabbitMQConstants.Uri.Replace("http", "amqp")}/{RabbitMQConstants.Events.LoadingInstructionCreated}";
 
             Uri endPointUri = new Uri(uri);
             ISendEndpoint ep = await _bus.GetSendEndpoint(endPointUri);
@@ -29,6 +26,25 @@ namespace DDDS.Test.WebAPI.Controllers
 
             return Ok();
         }
-       
+        
+        [HttpPost("LoadingInstructionApplied")]
+        public async Task<IActionResult> LoadingInstructionApplied(LoadingInstructionAppliedEventModel queueMessage, CancellationToken cancellationToken)
+        {
+            string uri = $"{RabbitMQConstants.Uri}/{RabbitMQConstants.Events.LoadingInstructionApplied}";
+
+            Uri endPointUri = new Uri(uri);
+            ISendEndpoint ep = await _bus.GetSendEndpoint(endPointUri);
+            await ep.Send(queueMessage, cancellationToken);
+
+            return Ok();
+        }
+
+        [HttpPost("InsertLoadingInstructionThresholdExceeded")]
+        public async Task<IActionResult> InsertLoadingInstructionThresholdExceeded(LoadingInstructionThresholdExceededEventModel queueMessage, CancellationToken cancellationToken)
+        {
+            await _bus.Publish(queueMessage, x => x.SetRoutingKey($"loadinginstructionexceeded.{queueMessage.CityCode}"), cancellationToken);
+            return Ok();
+        }
+
     }
 }

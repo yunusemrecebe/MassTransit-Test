@@ -1,72 +1,41 @@
-﻿using DDDS.Test.WebAPI.Constants;
-using DDDS.Test.WebAPI.Models.Entities;
-using DDDS.Test.WebAPI.Models.Interface;
+﻿using Asis.Framework.Monitoring.Interfaces;
+using LGW.MessageDistributor.Messagebus.Contract.Events;
 using MassTransit;
-using Microsoft.Extensions.Caching.Distributed;
-using System.Net.Http.Headers;
-using System.Text.Json;
 
 namespace DDDS.Consumer.MassTransit.Consumers
 {
-    public class LoadingInstructionCreatedConsumer : IConsumer<QueueMessage>
+    public class LoadingInstructionCreatedConsumer : IConsumer<LoadingInstructionCreatedEventModel>
     {
+        private readonly IMessageBus MessageBus;
 
-        public async Task Consume(ConsumeContext<QueueMessage> context)
+        public LoadingInstructionCreatedConsumer(IMessageBus messageBus)
         {
-            Console.WriteLine($"Data consumed {context.Message.CityCode}");
-
-            QueueMessage message = context.Message;
-            string cacheKey = message.CityCode.ToString();
-            
-            List<QueueMessage> cachedData = new() { message };
-            string getCacheResult = await GetCache(message.CityCode.ToString());
-
-            if (!string.IsNullOrEmpty(getCacheResult))
-                cachedData.AddRange(JsonSerializer.Deserialize<List<QueueMessage>>(getCacheResult));
-
-            await SaveCache(cacheKey, cachedData);
-
-            bool isThresholdExceeded = 5 <= cachedData.Count();
-
-            if (isThresholdExceeded)
-                await SendQueueMessages(context);
-
+            MessageBus = messageBus;
         }
-
-        private async Task SendQueueMessages(ConsumeContext<QueueMessage> context)
+        
+        public async Task Consume(ConsumeContext<LoadingInstructionCreatedEventModel> context)
         {
-            IQueueMessage message = context.Message;
-            ThresholdExceededMessage thresholdExceededMessage = new ThresholdExceededMessage { CityCode = message.CityCode };
-
-            string uri = $"{RabbitMQConstants.Uri}/{RabbitMQConstants.Events.LoadingInstructionThresholdExceeded}";
-            Uri endPointUri = new Uri(uri);
-            ISendEndpoint ep = await context.GetSendEndpoint(endPointUri);
-            await ep.Send(thresholdExceededMessage);
-            
-            Console.WriteLine($"Datalist is published");
+            try
+            {
+                LoadingInstructionCreatedEventModel message = context.Message;
+                await SendThresholdExceededMessage(context);
+            }
+            catch (Exception e)
+            {
+                throw;
+            }
         }
-
-        private async Task SaveCache(string cacheKey, List<QueueMessage> queueMessage)
+        
+        private async Task SendThresholdExceededMessage(ConsumeContext<LoadingInstructionCreatedEventModel> context)
         {
-            var client = new HttpClient();
-            var request = new HttpRequestMessage(HttpMethod.Post, $"http://localhost:5204/Cache/LoadingInstructions?cacheKey={cacheKey}");
-            var content = new StringContent(JsonSerializer.Serialize(queueMessage), null, "application/json");
-            request.Content = content;
-            var response = await client.SendAsync(request);
-            //response.EnsureSuccessStatusCode();
+            LoadingInstructionCreatedThresholdExceededEventModel thresholdExceededMessage = new LoadingInstructionCreatedThresholdExceededEventModel
+            {
+                CityCode = context.Message.CityCode,
+                CorrelationId = context.Message.CorrelationId
+            };
+
+            await MessageBus.SendAsync(thresholdExceededMessage);
+            // await QueueHelper.PublishMessage(context, thresholdExceededMessage);
         }
-
-        private async Task<string> GetCache(string cacheKey)
-        {
-            var client = new HttpClient();
-            var request = new HttpRequestMessage(HttpMethod.Get, $"http://localhost:5204/Cache/LoadingInstructions?cacheKey={cacheKey}");
-            
-            var response = await client.SendAsync(request);
-            //response.EnsureSuccessStatusCode();
-
-            var result = await response.Content.ReadAsStringAsync();
-            return result;
-        }
-
     }
 }
