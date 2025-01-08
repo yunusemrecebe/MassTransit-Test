@@ -7,9 +7,9 @@ namespace Asis.Framework.Monitoring.Decorators
     {
         public LoggingDecorator(IMessageBus innerBus) : base(innerBus)
         {
-            if (innerBus is RabbitMqMessageBus rabbitBus)
+            if (innerBus is IOnMessageReceived onReceivedBus)
             {
-                rabbitBus.OnMessageReceivedAsync += Consume;
+                onReceivedBus.OnMessageReceivedAsync += Consume;
             }
         }
 

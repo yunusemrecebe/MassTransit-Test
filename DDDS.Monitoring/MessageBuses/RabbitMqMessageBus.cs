@@ -7,7 +7,7 @@ using RabbitMQ.Client.Events;
 
 namespace Asis.Framework.Monitoring.MessageBuses
 {
-    public sealed class RabbitMqMessageBus : IMessageBus, IDisposable
+    public sealed class RabbitMqMessageBus : IMessageBus, IOnMessageReceived, IDisposable
     {
         private readonly RabbitMqOptions _options;
         private IConnection? _connection;

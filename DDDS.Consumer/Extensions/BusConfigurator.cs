@@ -1,4 +1,5 @@
-﻿using DDDS.Test.WebAPI.Constants;
+﻿using System;
+using DDDS.Test.WebAPI.Constants;
 using MassTransit;
 
 namespace DDDS.Test.WebAPI.Extensions

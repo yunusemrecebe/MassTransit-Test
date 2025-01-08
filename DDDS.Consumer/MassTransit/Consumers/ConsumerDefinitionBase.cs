@@ -1,4 +1,5 @@
-﻿using MassTransit;
+﻿using System;
+using MassTransit;
 
 namespace DDDS.Consumer.MassTransit.Consumers
 {
@@ -43,8 +44,8 @@ namespace DDDS.Consumer.MassTransit.Consumers
                 EndpointName = endPoint;
         }
 
-        protected override void ConfigureConsumer(IReceiveEndpointConfigurator endpointConfigurator,
-            IConsumerConfigurator<TConsumer> consumerConfigurator)
+        protected override void ConfigureConsumer(IReceiveEndpointConfigurator endpointConfigurator, IConsumerConfigurator<TConsumer> consumerConfigurator,
+            IRegistrationContext context)
         {
             endpointConfigurator.ConfigureConsumeTopology = false;
 
@@ -86,6 +87,50 @@ namespace DDDS.Consumer.MassTransit.Consumers
                 });
             }
         }
+
+        // protected override void ConfigureConsumer(IReceiveEndpointConfigurator endpointConfigurator,
+        //     IConsumerConfigurator<TConsumer> consumerConfigurator)
+        // {
+        //     endpointConfigurator.ConfigureConsumeTopology = false;
+        //
+        //     if (UseErrorTransport)
+        //     {
+        //         //endpointConfigurator.ConfigureError(settings =>
+        //         //{
+        //         //    if (settings is RabbitMqErrorSettings rabbitMqErrorSettings)
+        //         //    {
+        //         //        rabbitMqErrorSettings.QueueName = $"{typeof(TConsumer).Name.Replace("Consumer", "")}Error";
+        //         //        rabbitMqErrorSettings.ExchangeName = $"{typeof(TConsumer).Name.Replace("Consumer", "")}Error";
+        //         //    }
+        //         //});
+        //         endpointConfigurator.ConfigureDefaultErrorTransport();
+        //     }
+        //
+        //     if (UseRetryPolicy)
+        //     {
+        //         if (RetryInterval.HasValue)
+        //             endpointConfigurator.UseMessageRetry(x => x.Interval(RetryCount, RetryInterval.Value));
+        //         else
+        //             throw new ArgumentNullException("RetryInterval cannot be null when RetryPolicy is enabled!");
+        //     }
+        //
+        //     if (endpointConfigurator is IRabbitMqReceiveEndpointConfigurator rmq)
+        //     {
+        //         rmq.ExchangeType = ExchangeType;
+        //         rmq.Durable = IsDurable;
+        //
+        //         if (ConcurrentMessageLimit.HasValue)
+        //             rmq.ConcurrentMessageLimit = ConcurrentMessageLimit;
+        //
+        //         rmq.Bind(BindingExchangeName, e =>
+        //         {
+        //             if (!string.IsNullOrEmpty(RoutingKey))
+        //                 e.RoutingKey = RoutingKey;
+        //
+        //             e.ExchangeType = ExchangeType;
+        //         });
+        //     }
+        // }
     }
 
 }

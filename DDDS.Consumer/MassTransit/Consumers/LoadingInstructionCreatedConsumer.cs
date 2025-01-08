@@ -1,18 +1,20 @@
-﻿using Asis.Framework.Monitoring.Interfaces;
+﻿using System.Text.Json;
 using LGW.MessageDistributor.Messagebus.Contract.Events;
 using MassTransit;
+using MassTransit.Context;
 
 namespace DDDS.Consumer.MassTransit.Consumers
 {
     public class LoadingInstructionCreatedConsumer : IConsumer<LoadingInstructionCreatedEventModel>
     {
         private readonly IMessageBus MessageBus;
-
+        
         public LoadingInstructionCreatedConsumer(IMessageBus messageBus)
         {
             MessageBus = messageBus;
         }
         
+
         public async Task Consume(ConsumeContext<LoadingInstructionCreatedEventModel> context)
         {
             try
@@ -25,17 +27,20 @@ namespace DDDS.Consumer.MassTransit.Consumers
                 throw;
             }
         }
-        
+
         private async Task SendThresholdExceededMessage(ConsumeContext<LoadingInstructionCreatedEventModel> context)
         {
-            LoadingInstructionCreatedThresholdExceededEventModel thresholdExceededMessage = new LoadingInstructionCreatedThresholdExceededEventModel
-            {
-                CityCode = context.Message.CityCode,
-                CorrelationId = context.Message.CorrelationId
-            };
+            LoadingInstructionCreatedThresholdExceededEventModel thresholdExceededMessage =
+                new LoadingInstructionCreatedThresholdExceededEventModel
+                {
+                    CityCode = context.Message.CityCode,
+                    CorrelationId = context.Message.CorrelationId
+                };
 
             await MessageBus.SendAsync(thresholdExceededMessage);
             // await QueueHelper.PublishMessage(context, thresholdExceededMessage);
         }
+        
+        // public event Func<string, Task>? OnMessageReceivedAsync;
     }
 }
