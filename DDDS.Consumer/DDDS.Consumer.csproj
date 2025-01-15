@@ -8,35 +8,16 @@
   </PropertyGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Asis.Framework.Monitoring" Version="1.0.4" />
+		<PackageReference Include="Asis.Framework.Monitoring.Contract" Version="1.0.4" />
+		<PackageReference Include="Asis.Framework.Monitoring.Prometheus" Version="1.0.4" />
+		<PackageReference Include="Asis.Framework.Monitoring.RabbitMq" Version="1.0.4" />
+		<PackageReference Include="LGW.MessageDistributor.Messagebus.Contract" Version="1.0.1" />
 		<PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0"/>
 		<PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="8.0.0" />
-		<PackageReference Include="LGW.MessageDistributor.Messagebus.Contract" Version="1.0.1" />
-<!--		<PackageReference Include="MassTransit.Extensions.DependencyInjection" Version="7.3.1" />-->
-<!--		<PackageReference Include="MassTransit.RabbitMQ" Version="8.2.2" />-->
-		<PackageReference Include="RabbitMQ.Client" Version="7.0.0"/>
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.32"/>
-		<PackageReference Include="prometheus-net.AspNetCore" Version="6.0.0" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <ProjectReference Include="..\DDDS.Test.WebAPI\DDDS.Test.WebAPI.csproj" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Reference Include="Asis.Framework.Monitoring">
-	    <HintPath>..\..\..\asis.framework\Asis.Framework.Monitoring.MassTransit\bin\Debug\netcoreapp3.1\Asis.Framework.Monitoring.dll</HintPath>
-	  </Reference>
-	  <Reference Include="Asis.Framework.Monitoring.Contract">
-	    <HintPath>..\..\..\asis.framework\Asis.Framework.Monitoring.MassTransit\bin\Debug\netcoreapp3.1\Asis.Framework.Monitoring.Contract.dll</HintPath>
-	  </Reference>
-	  <Reference Include="Asis.Framework.Monitoring.MassTransit">
-	    <HintPath>..\..\..\asis.framework\Asis.Framework.Monitoring.MassTransit\bin\Debug\netcoreapp3.1\Asis.Framework.Monitoring.MassTransit.dll</HintPath>
-	  </Reference>
-	  <Reference Include="Asis.Framework.Monitoring.Prometheus">
-	    <HintPath>..\..\..\asis.framework\Asis.Framework.Monitoring.Prometheus\bin\Debug\netcoreapp3.1\Asis.Framework.Monitoring.Prometheus.dll</HintPath>
-	  </Reference>
-	  <Reference Include="Asis.Framework.Monitoring.RabbitMq">
-	    <HintPath>..\..\..\asis.framework\Asis.Framework.Monitoring.RabbitMq\bin\Debug\netcoreapp3.1\Asis.Framework.Monitoring.RabbitMq.dll</HintPath>
-	  </Reference>
+<!--		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.1.32"/>-->
+<!--		<PackageReference Include="RabbitMQ.Client" Version="7.0.0"/>-->
+<!--		<PackageReference Include="prometheus-net.AspNetCore" Version="6.0.0" />-->
 	</ItemGroup>
 
 	<ItemGroup>
@@ -45,16 +26,19 @@
 	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 	  </Content>
 	</ItemGroup>
-	
+		
 <!--	<ItemGroup>-->
 <!--	  <Reference Include="Asis.Framework.Monitoring">-->
-<!--	    <HintPath>..\..\..\asis.framework\Asis.Framework.Monitoring.MassTransit\bin\Debug\net8.0\Asis.Framework.Monitoring.dll</HintPath>-->
+<!--	    <HintPath>..\..\..\asis.framework\Asis.Framework.Monitoring.RabbitMq\bin\Debug\netcoreapp3.1\Asis.Framework.Monitoring.dll</HintPath>-->
 <!--	  </Reference>-->
 <!--	  <Reference Include="Asis.Framework.Monitoring.Contract">-->
-<!--	    <HintPath>..\..\..\asis.framework\Asis.Framework.Monitoring.MassTransit\bin\Debug\net8.0\Asis.Framework.Monitoring.Contract.dll</HintPath>-->
+<!--	    <HintPath>..\..\..\asis.framework\Asis.Framework.Monitoring.RabbitMq\bin\Debug\netcoreapp3.1\Asis.Framework.Monitoring.Contract.dll</HintPath>-->
 <!--	  </Reference>-->
-<!--	  <Reference Include="Asis.Framework.Monitoring.MassTransit">-->
-<!--	    <HintPath>..\..\..\asis.framework\Asis.Framework.Monitoring.MassTransit\bin\Debug\net8.0\Asis.Framework.Monitoring.MassTransit.dll</HintPath>-->
+<!--	  <Reference Include="Asis.Framework.Monitoring.Prometheus">-->
+<!--	    <HintPath>..\..\..\asis.framework\Asis.Framework.Monitoring.Prometheus\bin\Debug\netcoreapp3.1\Asis.Framework.Monitoring.Prometheus.dll</HintPath>-->
+<!--	  </Reference>-->
+<!--	  <Reference Include="Asis.Framework.Monitoring.RabbitMq">-->
+<!--	    <HintPath>..\..\..\asis.framework\Asis.Framework.Monitoring.RabbitMq\bin\Debug\netcoreapp3.1\Asis.Framework.Monitoring.RabbitMq.dll</HintPath>-->
 <!--	  </Reference>-->
 <!--	</ItemGroup>-->
 

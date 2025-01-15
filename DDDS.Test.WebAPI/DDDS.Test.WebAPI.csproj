@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Asis.Framework.Monitoring.RabbitMq" Version="1.0.3" />
     <PackageReference Include="LGW.MessageDistributor.Messagebus.Contract" Version="1.0.1" />
     <PackageReference Include="MassTransit" Version="8.2.2" />
     <PackageReference Include="MassTransit.RabbitMQ" Version="8.2.2" />

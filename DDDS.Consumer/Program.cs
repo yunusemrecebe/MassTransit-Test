@@ -1,18 +1,15 @@
-﻿using System.Text.Json;
+﻿using System.Collections.Concurrent;
+using System.Text.Json;
 using Asis.Framework.Monitoring;
+using Asis.Framework.Monitoring.Contract.Interfaces;
 using Asis.Framework.Monitoring.Contract.Models;
 using Asis.Framework.Monitoring.RabbitMq;
 using Asis.Framework.Monitoring.RabbitMq.MessageBuses;
-using DDDS.Consumer.MassTransit.Consumers;
-using DDDS.Test.WebAPI.Constants;
 using LGW.MessageDistributor.Messagebus.Contract.Events;
-using MassTransit;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Prometheus;
-using RegistrationContextExtensions = MassTransit.RegistrationContextExtensions;
-using RegistrationExtensions = MassTransit.RegistrationExtensions;
 
 namespace DDDS.Consumer
 {
@@ -27,20 +24,19 @@ namespace DDDS.Consumer
                     services.RegisterAsisMetricsLogger();
 
                     IConfigurationSection section = hostContext.Configuration.GetSection("RabbitMqOptions");
-                    RabbitMqOptions options = section.Get<RabbitMqOptions>() ??
-                                              throw new ArgumentNullException(nameof(RabbitMqOptions));
+                    RabbitMqOptions options = section.Get<RabbitMqOptions>() ?? throw new ArgumentNullException(nameof(RabbitMqOptions));
 
-                    services.BuildAsisRabbitMqConsumer<RabbitMqMessageBus>(JsonSerializer.Serialize(options));
+                   services.BuildAsisRabbitMqConsumer<RabbitMqMessageBus>(JsonSerializer.Serialize(options));
                 }).Build();
-            
+
             await app.StartAsync();
-            
+
             var metricServer = new KestrelMetricServer(port: 1234);
             metricServer.Start();
-            
+
             IMessageBus bus = app.Services.GetRequiredService<IMessageBus>();
-            await TestRabbitMq(bus);
-            
+             await TestRabbitMq(bus);
+
             await app.StopAsync();
         }
 
@@ -55,40 +51,52 @@ namespace DDDS.Consumer
                 {
                     var testMessage = new LoadingInstructionCreatedEventModel
                     {
-                        CityCode = 33,
+                        CityCode = new Random().Next(20,35),
                         CorrelationId = Guid.NewGuid().ToString(),
                         DeliveryType = "Instantly",
                         RefNo = Guid.NewGuid().ToString()
                     };
-                            
-                    await bus.SendAsync(testMessage);
+
+                    bool isCorrelationIdParsed = Guid.TryParse(testMessage.CorrelationId, out Guid correlationId);
+
+                    ConcurrentDictionary<string, object> asisMonitoringContextItems = new ConcurrentDictionary<string, object>();
+                    asisMonitoringContextItems.TryAdd("CityId", testMessage.CityCode);
+
+                    await bus.SendAsync(testMessage,
+                        new AsisMonitoringContextOptions
+                        {
+                            CorrelationId = isCorrelationIdParsed ? correlationId : null,
+                            Endpoint = "LoadingInstructionCreated",
+                            Items = asisMonitoringContextItems
+                        });
                 }
             }
-            
+
             Console.WriteLine("Exiting...");
         }
 
         private static void MassTransit(IServiceCollection services)
         {
-            services.AddMassTransit(x =>
-            {
-                RegistrationExtensions.AddConsumer<LoadingInstructionCreatedConsumer,LoadingInstructionCreatedConsumerDefinition>(x);
-
-                x.UsingRabbitMq((ctx, cfg) =>
-                {
-                    Uri uri = new(
-                        $"amqp://{RabbitMQConstants.Host}:{RabbitMQConstants.Port}");
-                    cfg.Host(uri, "/", c =>
-                    {
-                        c.Username(RabbitMQConstants.Username);
-                        c.Password(RabbitMQConstants.Password);
-                    });
-                    
-                    RegistrationContextExtensions.ConfigureEndpoints(cfg, ctx);
-                });
-            });
+            // services.AddMassTransit(x =>
+            // {
+            //     RegistrationExtensions
+            //         .AddConsumer<LoadingInstructionCreatedConsumer, LoadingInstructionCreatedConsumerDefinition>(x);
+            //
+            //     x.UsingRabbitMq((ctx, cfg) =>
+            //     {
+            //         Uri uri = new(
+            //             $"amqp://{RabbitMQConstants.Host}:{RabbitMQConstants.Port}");
+            //         cfg.Host(uri, "/", c =>
+            //         {
+            //             c.Username(RabbitMQConstants.Username);
+            //             c.Password(RabbitMQConstants.Password);
+            //         });
+            //
+            //         RegistrationContextExtensions.ConfigureEndpoints(cfg, ctx);
+            //     });
+            // });
         }
-        
+
         private static void MassTransitOld(IServiceCollection services)
         {
             // services.AddTransient<LoadingInstructionCreatedConsumer>();
@@ -126,21 +134,21 @@ namespace DDDS.Consumer
 
         private static async Task RabbitMQ()
         {
-            var options = new RabbitMqOptions
-            {
-                HostName = "localhost",
-                Port = 5672,
-                UserName = "guest",
-                Password = "guest",
-                QueueName = "LoadingInstructionCreated",
-                ExchangeName = "LoadingInstructionCreated",
-                ExchangeType = "fanout",
-                RoutingKey = "",
-                PrefetchCount = 5,
-                AutoAck = true,
-                EnablePublisherConfirms = true,
-                PersistentMessages = true
-            };
+            // var options = new RabbitMqOptions
+            // {
+            //     HostName = "localhost",
+            //     Port = 5672,
+            //     UserName = "guest",
+            //     Password = "guest",
+            //     QueueName = "LoadingInstructionCreated",
+            //     ExchangeName = "LoadingInstructionCreated",
+            //     ExchangeType = "fanout",
+            //     RoutingKey = "",
+            //     PrefetchCount = 5,
+            //     AutoAck = true,
+            //     EnablePublisherConfirms = true,
+            //     PersistentMessages = true
+            // };
             //
             // using var rabbitBus = new RabbitMqMessageBus(options);
             // IMessageBus bus = new LoggingDecorator(rabbitBus);
