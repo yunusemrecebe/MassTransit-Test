@@ -1,8 +1,7 @@
-﻿using DDDS.Test.WebAPI.Models.Entities;
-using DDDS.Test.WebAPI.Repository;
+﻿using DDDS.Test.WebAPI.Repository;
+using LGW.MessageDistributor.Messagebus.Contract.Events;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Distributed;
-using System.Text.Json;
 
 namespace DDDS.Test.WebAPI.Controllers
 {
@@ -25,7 +24,7 @@ namespace DDDS.Test.WebAPI.Controllers
         }
 
         [HttpPost("LoadingInstructions")]
-        public async Task<IActionResult> InsertLoadingInstructionCache(string cacheKey, List<QueueMessage> queueMessage)
+        public async Task<IActionResult> InsertLoadingInstructionCache(string cacheKey, List<LoadingInstructionCreatedEventModel> queueMessage)
         {
             await _distributedCache.AddOrUpdate($"LoadingInstructions_{cacheKey}", queueMessage);
             return Ok(queueMessage);

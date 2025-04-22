@@ -1,6 +1,5 @@
 ﻿using DDDS.Test.WebAPI.Constants;
-using DDDS.Test.WebAPI.Models.Entities;
-using LGW.MessageDistributor.MessageBus.Domain.Models;
+using LGW.MessageDistributor.Messagebus.Contract.Events;
 using MassTransit;
 using Microsoft.AspNetCore.Mvc;
 
@@ -16,7 +15,7 @@ namespace DDDS.Test.WebAPI.Controllers
             _bus = bus;
         }
 
-        [HttpPost]
+        [HttpPost("InsertLoadingInstruction")]
         public async Task<IActionResult> InsertLoadingInstruction(LoadingInstructionCreatedEventModel queueMessage, CancellationToken cancellationToken)
         {
             //queueMessage MSSQL YuklemeTalimatlari tablosuna Insert Et
@@ -27,6 +26,16 @@ namespace DDDS.Test.WebAPI.Controllers
             ISendEndpoint ep = await _bus.GetSendEndpoint(endPointUri);
             await ep.Send(queueMessage, cancellationToken);
 
+            return Ok();
+        }
+
+        [HttpPost("LoadingInstructionThresholdExceeded")]
+        public async Task<IActionResult> LoadingInstructionThresholdExceeded(LoadingInstructionCreatedThresholdExceededEventModel queueMessage, CancellationToken cancellationToken)
+        {
+            //queueMessage MSSQL YuklemeTalimatlari tablosuna Insert Et
+
+            await _bus.Publish(queueMessage);
+            
             return Ok();
         }
        
