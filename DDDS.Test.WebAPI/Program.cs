@@ -1,5 +1,8 @@
 using DDDS.Test.WebAPI.Constants;
+using LGW.MessageDistributor.Messagebus.Contract.Events;
+using LGW.MessageDistributor.MessageBus.Core.Consts;
 using MassTransit;
+using RabbitMQ.Client;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +25,144 @@ builder.Services.AddMassTransit(x =>
             c.Username(RabbitMQConstants.Username);
             c.Password(RabbitMQConstants.Password);
         });
+
+
+        #region [ Event Model Configurations ]
+
+        #region [ LoadingInstructionCreatedThresholdExceeded ]
+
+        cfg.Message<LoadingInstructionCreatedThresholdExceededEventModel>(e => e.SetEntityName(MessageBusConsts.Events.LoadingInstructionThresholdExceeded)); // name of the primary exchange
+        cfg.Publish<LoadingInstructionCreatedThresholdExceededEventModel>(e => e.ExchangeType = ExchangeType.Topic); // primary exchange type
+        cfg.Send<LoadingInstructionCreatedThresholdExceededEventModel>(e =>
+        {
+            e.UseCorrelationId(x =>
+            {
+                if (Guid.TryParse(x.CorrelationId, out Guid correlationId))
+                {
+                }
+                else
+                {
+                    if (string.IsNullOrEmpty(x.CorrelationId))
+                    {
+                        correlationId = Guid.NewGuid();
+                    }
+                    else
+                    {
+
+                        string c = "";
+                        x.CorrelationId.TakeLast(36).ToList().ForEach(x => c += x);
+
+                        if (Guid.TryParse(c, out correlationId))
+                        {
+
+                        }
+                        else
+                        {
+                            correlationId = Guid.NewGuid();
+                        }
+                    }
+                }
+
+                return correlationId;
+            });
+            e.UseRoutingKeyFormatter(context =>
+            {
+                return $"{MessageBusConsts.RoutingKeys.LoadingInstructionCreatedExceeded}.{context.Message.CityCode}";
+            });
+        });
+
+
+        #endregion
+
+        #region [ LoadingInstructionAppliedThresholdExceeded ]
+
+        cfg.Message<LoadingInstructionAppliedThresholdExceededEventModel>(e => e.SetEntityName(MessageBusConsts.Events.LoadingInstructionThresholdExceeded)); // name of the primary exchange
+        cfg.Publish<LoadingInstructionAppliedThresholdExceededEventModel>(e => e.ExchangeType = ExchangeType.Topic); // primary exchange type
+        cfg.Send<LoadingInstructionAppliedThresholdExceededEventModel>(e =>
+        {
+            e.UseCorrelationId(x =>
+            {
+                if (Guid.TryParse(x.CorrelationId, out Guid correlationId))
+                {
+                }
+                else
+                {
+                    if (string.IsNullOrEmpty(x.CorrelationId))
+                    {
+                        correlationId = Guid.NewGuid();
+                    }
+                    else
+                    {
+
+                        string c = "";
+                        x.CorrelationId.TakeLast(36).ToList().ForEach(x => c += x);
+
+                        if (Guid.TryParse(c, out correlationId))
+                        {
+
+                        }
+                        else
+                        {
+                            correlationId = Guid.NewGuid();
+                        }
+                    }
+                }
+
+                return correlationId;
+            });
+            e.UseRoutingKeyFormatter(context =>
+            {
+                return $"{MessageBusConsts.RoutingKeys.LoadingInstructionAppliedExceeded}.{context.Message.CityCode}";
+            });
+        });
+
+        #endregion
+
+        #region [ LoadingInstructionCancelledThresholdExceeded ]
+
+        cfg.Message<LoadingInstructionCancelledThresholdExceededEventModel>(e => e.SetEntityName(MessageBusConsts.Events.LoadingInstructionThresholdExceeded)); // name of the primary exchange
+        cfg.Publish<LoadingInstructionCancelledThresholdExceededEventModel>(e => e.ExchangeType = ExchangeType.Topic); // primary exchange type
+        cfg.Send<LoadingInstructionCancelledThresholdExceededEventModel>(e =>
+        {
+            e.UseCorrelationId(x =>
+            {
+                if (Guid.TryParse(x.CorrelationId, out Guid correlationId))
+                {
+                }
+                else
+                {
+                    if (string.IsNullOrEmpty(x.CorrelationId))
+                    {
+                        correlationId = Guid.NewGuid();
+                    }
+                    else
+                    {
+
+                        string c = "";
+                        x.CorrelationId.TakeLast(36).ToList().ForEach(x => c += x);
+
+                        if (Guid.TryParse(c, out correlationId))
+                        {
+
+                        }
+                        else
+                        {
+                            correlationId = Guid.NewGuid();
+                        }
+                    }
+                }
+
+                return correlationId;
+            });
+            e.UseRoutingKeyFormatter(context =>
+            {
+                return $"{MessageBusConsts.RoutingKeys.LoadingInstructionCancelledExceeded}.{context.Message.CityCode}";
+            });
+        });
+
+        #endregion
+
+        #endregion
 
         cfg.ConfigureEndpoints(ctx);
     });

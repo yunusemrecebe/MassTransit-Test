@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
@@ -7,13 +7,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Asis.Framework.Monitoring.RabbitMq" Version="1.0.3" />
-    <PackageReference Include="LGW.MessageDistributor.Messagebus.Contract" Version="1.0.1" />
-    <PackageReference Include="MassTransit" Version="8.2.2" />
-    <PackageReference Include="MassTransit.RabbitMQ" Version="8.2.2" />
+    <PackageReference Include="Asis.Framework.DDDS" Version="1.0.3" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
-	<PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="8.0.6" />
 
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="LGW.MessageDistributor.Messagebus.Contract">
+      <HintPath>..\..\..\lgw\loadinggateway\lgw.messagedistributor\LGW.MessageDistributor.Messagebus.Contract\bin\Debug\net8.0\LGW.MessageDistributor.Messagebus.Contract.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
